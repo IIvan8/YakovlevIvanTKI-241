@@ -9,6 +9,7 @@
 #include "../Decision2/Task1.h"
 #include "../Decision2/Task2.h"
 #include "../Decision2/Task3.h"
+#include "../Decision2/Generator.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace miit::algebra;
@@ -55,9 +56,7 @@ namespace MatrixTests
             std::vector<int> values = { 1, 2, 3 };
             Matrix matrix(values);
             std::string result = matrix.to_string();
-            Assert::IsTrue(result.find("1") != std::string::npos);
-            Assert::IsTrue(result.find("2") != std::string::npos);
-            Assert::IsTrue(result.find("3") != std::string::npos);
+            Assert::AreEqual(std::string("1 2 3"), result);
         }
 
         TEST_METHOD(TestEmptyMatrix)
@@ -71,6 +70,38 @@ namespace MatrixTests
         {
             Matrix matrix(3);
             Assert::IsFalse(matrix.empty());
+        }
+        TEST_METHOD(TestMatrixFillWithGenerator)
+        {
+            Matrix matrix(3);
+            auto generator = std::make_unique<ConstantGenerator>(7);
+            matrix.fill(std::move(generator));
+
+            Assert::AreEqual(7, matrix[0]);
+            Assert::AreEqual(7, matrix[1]);
+            Assert::AreEqual(7, matrix[2]);
+        }
+        TEST_METHOD(TestMatrixDereferenceOperator)
+        {
+            std::vector<int> values = { 1, 2, 3 };
+            Matrix matrix(values);
+            const std::vector<int>& data = *matrix;
+            Assert::AreEqual(values.size(), data.size());
+            for (size_t i = 0; i < values.size(); ++i) {
+                Assert::AreEqual(values[i], data[i]);
+            }
+        }
+        TEST_METHOD(TestMatrixIterators)
+        {
+            std::vector<int> values = { 1, 2, 3 };
+            Matrix matrix(values);
+
+            size_t count = 0;
+            for (auto it = matrix.begin(); it != matrix.end(); ++it) {
+                Assert::AreEqual(values[count], *it);
+                count++;
+            }
+            Assert::AreEqual(values.size(), count);
         }
     };
 
@@ -125,11 +156,19 @@ namespace MatrixTests
             // -5 должен быть заменен на | -5 | = 5
             Assert::AreEqual(5, (*result)[0]);
         }
-
-        TEST_METHOD(Task1GetName)
+        TEST_METHOD(Task1WithAllNegativeElements)
         {
+            std::vector<int> values = { -1, -2, -3, -4 };
+            Matrix matrix(values);
             Task1 task;
-            Assert::AreEqual(std::string("Замена последнего отрицательного элемента на модуль первого"), task.get_name());
+            auto result = task.execute(matrix);
+
+            // Последний отрицательный (-4) должен быть заменен на | -1 | = 1
+            Assert::AreEqual(1, (*result)[3]);
+            // Остальные остаются без изменений
+            Assert::AreEqual(-1, (*result)[0]);
+            Assert::AreEqual(-2, (*result)[1]);
+            Assert::AreEqual(-3, (*result)[2]);
         }
     };
 
@@ -187,12 +226,6 @@ namespace MatrixTests
             // Все однозначные числа не имеют повторяющихся цифр
             Assert::AreEqual(size_t(3), result->size());
         }
-
-        TEST_METHOD(Task2GetName)
-        {
-            Task2 task;
-            Assert::AreEqual(std::string("Удаление элементов с повторяющимися цифрами"), task.get_name());
-        }
     };
 
     TEST_CLASS(Task3Tests)
@@ -233,12 +266,6 @@ namespace MatrixTests
             // Индекс 0 (четный): 0 * 10 = 0
             Assert::AreEqual(0, (*result)[0]);
         }
-
-        TEST_METHOD(Task3GetName)
-        {
-            Task3 task;
-            Assert::AreEqual(std::string("Преобразование массива по правилу: четные индексы - умножение, нечетные - смена знака"), task.get_name());
-        }
     };
 
     TEST_CLASS(ExerciseTests)
@@ -254,6 +281,9 @@ namespace MatrixTests
             );
 
             Assert::AreEqual(size_t(3), exercise->get_matrix().size());
+            Assert::AreEqual(1, exercise->get_matrix()[0]);
+            Assert::AreEqual(2, exercise->get_matrix()[1]);
+            Assert::AreEqual(3, exercise->get_matrix()[2]);
         }
 
         TEST_METHOD(ExerciseTaskExecution)
@@ -264,9 +294,9 @@ namespace MatrixTests
                 std::make_unique<RandomGenerator>(0, 1)
             );
 
-            auto task1_result = exercise->execute_task1();
-            auto task2_result = exercise->execute_task2();
-            auto task3_result = exercise->execute_task3();
+            auto task1_result = exercise->execute_task(1);
+            auto task2_result = exercise->execute_task(2);
+            auto task3_result = exercise->execute_task(3);
 
             Assert::IsTrue(task1_result != nullptr);
             Assert::IsTrue(task2_result != nullptr);
@@ -284,9 +314,9 @@ namespace MatrixTests
                 std::make_unique<RandomGenerator>(0, 1)
             );
 
-            Assert::IsFalse(exercise->get_task1_name().empty());
-            Assert::IsFalse(exercise->get_task2_name().empty());
-            Assert::IsFalse(exercise->get_task3_name().empty());
+            Assert::AreEqual(std::string("Task1"), exercise->get_task_name(1));
+            Assert::AreEqual(std::string("Task2"), exercise->get_task_name(2));
+            Assert::AreEqual(std::string("Task3"), exercise->get_task_name(3));
         }
     };
 
@@ -308,6 +338,38 @@ namespace MatrixTests
             RandomGenerator gen(5, 5);
             int value = gen.generate();
             Assert::AreEqual(5, value);
+        }
+
+        TEST_METHOD(ConstantGeneratorReturnsConstantValue)
+        {
+            ConstantGenerator gen(42);
+            Assert::AreEqual(42, gen.generate());
+            Assert::AreEqual(42, gen.generate());
+            Assert::AreEqual(42, gen.generate());
+        }
+
+        TEST_METHOD(ConstantGeneratorWithZero)
+        {
+            ConstantGenerator gen(0);
+            Assert::AreEqual(0, gen.generate());
+        }
+
+        TEST_METHOD(ConstantGeneratorWithNegativeValue)
+        {
+            ConstantGenerator gen(-100);
+            Assert::AreEqual(-100, gen.generate()); 
+        }
+
+        TEST_METHOD(ConstantGeneratorWithMatrixFill)
+        {
+            auto matrix = std::make_unique<Matrix>(5);
+            auto constant_gen = std::make_unique<ConstantGenerator>(7);
+
+            matrix->fill(std::move(constant_gen));
+
+            for (size_t i = 0; i < matrix->size(); ++i) {
+                Assert::AreEqual(7, (*matrix)[i]);
+            }
         }
     };
 }

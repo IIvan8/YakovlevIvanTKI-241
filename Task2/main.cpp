@@ -1,94 +1,104 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <memory>
 #include <locale>
 #include "../Decision2/Matrix.h"
 #include "../Decision2/RandomGenerator.h"
 #include "../Decision2/IStreamGenerator.h"
 #include "../Decision2/Exercise.h"
+#include "../Decision2/Generator.h"
 
 
 using namespace miit::algebra;
-
-void demonstrate_random_fill();
-void demonstrate_keyboard_fill();
 
 int main()
 {
     setlocale(LC_ALL, "RUSSIAN");
     try
     {
-        std::cout << "=== Демонстрация работы с случайным заполнением ===" << std::endl;
-        demonstrate_random_fill();
+        std::cout << "=== Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ СЃР»СѓС‡Р°Р№РЅС‹Рј Р·Р°РїРѕР»РЅРµРЅРёРµРј ===" << std::endl;
 
-        std::cout << "\n=== Демонстрация работы с вводом с клавиатуры ===" << std::endl;
-        demonstrate_keyboard_fill();
+        // Р—Р°РїРѕР»РЅСЏРµРј РјР°С‚СЂРёС†Сѓ Р”Рћ СЃРѕР·РґР°РЅРёСЏ Exercise
+        auto random_matrix = std::make_unique<Matrix>(8);
+        auto random_generator = std::make_unique<RandomGenerator>(-50, 50);
+        random_matrix->fill(std::move(random_generator));
+
+        auto random_exercise = std::make_unique<Exercise>(
+            std::move(random_matrix),
+            std::make_unique<RandomGenerator>(-50, 50) // РІС‚РѕСЂРѕР№ РіРµРЅРµСЂР°С‚РѕСЂ РґР»СЏ Exercise
+        );
+
+        std::cout << "РСЃС…РѕРґРЅС‹Р№ РјР°СЃСЃРёРІ: " << random_exercise->get_matrix() << std::endl;
+
+        auto task1_random = random_exercise->execute_task(1);
+        std::cout << random_exercise->get_task_name(1) << ": " << *task1_random << std::endl;
+
+        auto task2_random = random_exercise->execute_task(2);
+        std::cout << random_exercise->get_task_name(2) << ": " << *task2_random << std::endl;
+
+        auto task3_random = random_exercise->execute_task(3);
+        std::cout << random_exercise->get_task_name(3) << ": " << *task3_random << std::endl;
+
+        std::cout << "\n=== Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ РІРІРѕРґРѕРј СЃ РєР»Р°РІРёР°С‚СѓСЂС‹ ===" << std::endl;
+
+        std::cout << "Р’РІРµРґРёС‚Рµ СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°: ";
+        size_t size;
+        std::cin >> size;
+
+        if (size == 0)
+        {
+            std::cout << "Р Р°Р·РјРµСЂ РјР°СЃСЃРёРІР° РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0" << std::endl;
+            return 1;
+        }
+
+        // Р—Р°РїРѕР»РЅСЏРµРј РјР°С‚СЂРёС†Сѓ Р”Рћ СЃРѕР·РґР°РЅРёСЏ Exercise
+        auto keyboard_matrix = std::make_unique<Matrix>(size);
+        auto keyboard_generator = std::make_unique<IStreamGenerator>();
+        keyboard_matrix->fill(std::move(keyboard_generator));
+
+        auto keyboard_exercise = std::make_unique<Exercise>(
+            std::move(keyboard_matrix),
+            std::make_unique<IStreamGenerator>() // РІС‚РѕСЂРѕР№ РіРµРЅРµСЂР°С‚РѕСЂ РґР»СЏ Exercise
+        );
+
+        std::cout << "Р’РІРµРґРµРЅРЅС‹Р№ РјР°СЃСЃРёРІ: " << keyboard_exercise->get_matrix() << std::endl;
+
+        auto task1_keyboard = keyboard_exercise->execute_task(1);
+        std::cout << keyboard_exercise->get_task_name(1) << ": " << *task1_keyboard << std::endl;
+
+        auto task2_keyboard = keyboard_exercise->execute_task(2);
+        std::cout << keyboard_exercise->get_task_name(2) << ": " << *task2_keyboard << std::endl;
+
+        auto task3_keyboard = keyboard_exercise->execute_task(3);
+        std::cout << keyboard_exercise->get_task_name(3) << ": " << *task3_keyboard << std::endl;
+
+        std::cout << "\n=== Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ РїРѕСЃС‚РѕСЏРЅРЅС‹Рј Р·Р°РїРѕР»РЅРµРЅРёРµРј ===" << std::endl;
+
+        // Р—Р°РїРѕР»РЅСЏРµРј РјР°С‚СЂРёС†Сѓ Р”Рћ СЃРѕР·РґР°РЅРёСЏ Exercise
+        auto constant_matrix = std::make_unique<Matrix>(6);
+        auto constant_generator = std::make_unique<ConstantGenerator>(42);
+        constant_matrix->fill(std::move(constant_generator));
+
+        auto constant_exercise = std::make_unique<Exercise>(
+            std::move(constant_matrix),
+            std::make_unique<ConstantGenerator>(42) // РІС‚РѕСЂРѕР№ РіРµРЅРµСЂР°С‚РѕСЂ РґР»СЏ Exercise
+        );
+
+        std::cout << "РњР°СЃСЃРёРІ, Р·Р°РїРѕР»РЅРµРЅРЅС‹Р№ ConstantGenerator(42): " << constant_exercise->get_matrix() << std::endl;
+
+        auto task1_constant = constant_exercise->execute_task(1);
+        std::cout << constant_exercise->get_task_name(1) << ": " << *task1_constant << std::endl;
+
+        auto task2_constant = constant_exercise->execute_task(2);
+        std::cout << constant_exercise->get_task_name(2) << ": " << *task2_constant << std::endl;
+
+        auto task3_constant = constant_exercise->execute_task(3);
+        std::cout << constant_exercise->get_task_name(3) << ": " << *task3_constant << std::endl;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Ошибка: " << e.what() << std::endl;
+        std::cerr << "РћС€РёР±РєР°: " << e.what() << std::endl;
         return 1;
     }
 
     return 0;
-}
-
-void demonstrate_random_fill()
-{
-    // Создаем матрицу размером 8 элементов
-    auto matrix = std::make_unique<Matrix>(8);
-
-    // Создаем упражнение
-    auto exercise = std::make_unique<Exercise>(
-        std::move(matrix),
-        std::make_unique<RandomGenerator>(-50, 50)
-    );
-
-    // Заполняем матрицу
-    exercise->fill_matrix();
-
-    std::cout << "Исходный массив: " << exercise->get_matrix() << std::endl;
-
-    // Выполняем задания
-    auto task1_result = exercise->execute_task1();
-    std::cout << exercise->get_task1_name() << ": " << *task1_result << std::endl;
-
-    auto task2_result = exercise->execute_task2();
-    std::cout << exercise->get_task2_name() << ": " << *task2_result << std::endl;
-
-    auto task3_result = exercise->execute_task3();
-    std::cout << exercise->get_task3_name() << ": " << *task3_result << std::endl;
-}
-
-void demonstrate_keyboard_fill()
-{
-    std::cout << "Введите размер массива: ";
-    size_t size;
-    std::cin >> size;
-
-    if (size == 0)
-    {
-        std::cout << "Размер массива должен быть больше 0" << std::endl;
-        return;
-    }
-
-    auto matrix = std::make_unique<Matrix>(size);
-    auto exercise = std::make_unique<Exercise>(
-        std::move(matrix),
-        std::make_unique<IStreamGenerator>()
-    );
-
-    std::cout << "Введите " << size << " элементов массива: ";
-    exercise->fill_matrix();
-
-    std::cout << "Введенный массив: " << exercise->get_matrix() << std::endl;
-
-    // Выполняем задания
-    auto task1_result = exercise->execute_task1();
-    std::cout << exercise->get_task1_name() << ": " << *task1_result << std::endl;
-
-    auto task2_result = exercise->execute_task2();
-    std::cout << exercise->get_task2_name() << ": " << *task2_result << std::endl;
-
-    auto task3_result = exercise->execute_task3();
-    std::cout << exercise->get_task3_name() << ": " << *task3_result << std::endl;
 }

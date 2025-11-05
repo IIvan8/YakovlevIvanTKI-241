@@ -1,4 +1,4 @@
-#include "Task3.h"
+п»ї#include "Task3.h"
 
 namespace miit::algebra
 {
@@ -19,10 +19,5 @@ namespace miit::algebra
         }
 
         return result;
-    }
-
-    std::string Task3::get_name() const
-    {
-        return "Преобразование массива по правилу: четные индексы - умножение, нечетные - смена знака";
     }
 }

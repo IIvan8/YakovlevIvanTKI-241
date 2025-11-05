@@ -1,11 +1,15 @@
-#include "Exercise.h"
+﻿#include "Exercise.h"
+#include <stdexcept>
 
 namespace miit::algebra
 {
     Exercise::Exercise(std::unique_ptr<Matrix> matrix, std::unique_ptr<Generator> generator)
-        : matrix(std::move(matrix))
-        , generator(std::move(generator))
+        : matrix(std::move(matrix)), generator(std::move(generator))
     {
+        if (this->matrix == nullptr)
+        {
+            throw std::invalid_argument("Matrix cannot be null");
+        }
     }
 
     const Matrix& Exercise::get_matrix() const
@@ -13,47 +17,44 @@ namespace miit::algebra
         return *matrix;
     }
 
-    void Exercise::fill_matrix()
+    std::unique_ptr<Matrix> Exercise::execute_task(int task_number) const
     {
-        if (matrix && generator)
+        switch (task_number)
         {
-            matrix->fill(std::move(generator));
+        case 1:
+        {
+            Task1 task1; 
+            return task1.execute(*matrix); 
+        }
+        case 2:
+        {
+            Task2 task2; 
+            return task2.execute(*matrix); 
+        }
+        case 3:
+        {
+            Task3 task3; 
+            return task3.execute(*matrix); 
+        }
+        default:
+            throw std::invalid_argument("Invalid task number: " + std::to_string(task_number) +
+                ". Valid values are 1, 2, 3.");
         }
     }
 
-    std::unique_ptr<Matrix> Exercise::execute_task1() const
+    std::string Exercise::get_task_name(int task_number) const
     {
-        Task1 task;
-        return task.execute(*matrix);
-    }
-
-    std::unique_ptr<Matrix> Exercise::execute_task2() const
-    {
-        Task2 task;
-        return task.execute(*matrix);
-    }
-
-    std::unique_ptr<Matrix> Exercise::execute_task3() const
-    {
-        Task3 task;
-        return task.execute(*matrix);
-    }
-
-    std::string Exercise::get_task1_name() const
-    {
-        Task1 task;
-        return task.get_name();
-    }
-
-    std::string Exercise::get_task2_name() const
-    {
-        Task2 task;
-        return task.get_name();
-    }
-
-    std::string Exercise::get_task3_name() const
-    {
-        Task3 task;
-        return task.get_name();
+        switch (task_number)
+        {
+        case 1:
+            return "Task1";
+        case 2:
+            return "Task2";
+        case 3:
+            return "Task3";
+        default:
+            throw std::invalid_argument("Invalid task number: " + std::to_string(task_number) +
+                ". Valid values are 1, 2, 3.");
+        }
     }
 }

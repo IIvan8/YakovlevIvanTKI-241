@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "Matrix.h"
 #include <memory>
@@ -7,22 +7,16 @@
 namespace miit::algebra
 {
     /**
-    * @brief Задание 3: Преобразование массива по правилу
+    * @brief Р—Р°РґР°РЅРёРµ 3: РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјР°СЃСЃРёРІР° РїРѕ РїСЂР°РІРёР»Сѓ
     */
     class Task3
     {
     public:
         /**
-        * @brief Выполняет задание
-        * @param matrix Исходная матрица
-        * @return Результирующая матрица
+        * @brief Р’С‹РїРѕР»РЅСЏРµС‚ Р·Р°РґР°РЅРёРµ
+        * @param matrix РСЃС…РѕРґРЅР°СЏ РјР°С‚СЂРёС†Р°
+        * @return Р РµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РјР°С‚СЂРёС†Р°
         */
         std::unique_ptr<Matrix> execute(const Matrix& matrix) const;
-
-        /**
-        * @brief Возвращает название задания
-        * @return Название задания
-        */
-        std::string get_name() const;
     };
 }

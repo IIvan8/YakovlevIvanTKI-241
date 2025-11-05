@@ -1,4 +1,4 @@
-#include "Task2.h"
+п»ї#include "Task2.h"
 #include <string>
 #include <cmath>
 #include <vector>
@@ -18,11 +18,6 @@ namespace miit::algebra
         }
 
         return std::make_unique<Matrix>(new_data);
-    }
-
-    std::string Task2::get_name() const
-    {
-        return "Удаление элементов с повторяющимися цифрами";
     }
 
     bool Task2::has_repeating_digits(int number) const

@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "Matrix.h"
 #include <memory>
@@ -7,29 +7,23 @@
 namespace miit::algebra
 {
     /**
-    * @brief Задание 2: Удаление элементов с повторяющимися цифрами
+    * @brief Р—Р°РґР°РЅРёРµ 2: РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ СЃ РїРѕРІС‚РѕСЂСЏСЋС‰РёРјРёСЃСЏ С†РёС„СЂР°РјРё
     */
     class Task2
     {
     public:
         /**
-        * @brief Выполняет задание
-        * @param matrix Исходная матрица
-        * @return Результирующая матрица
+        * @brief Р’С‹РїРѕР»РЅСЏРµС‚ Р·Р°РґР°РЅРёРµ
+        * @param matrix РСЃС…РѕРґРЅР°СЏ РјР°С‚СЂРёС†Р°
+        * @return Р РµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РјР°С‚СЂРёС†Р°
         */
-        std::unique_ptr<Matrix> execute(const Matrix& matrix) const;
-
-        /**
-        * @brief Возвращает название задания
-        * @return Название задания
-        */
-        std::string get_name() const;
+        std::unique_ptr<Matrix> execute(const Matrix& matrix) const;  
 
     private:
         /**
-        * @brief Проверяет есть ли в числе повторяющиеся цифры
-        * @param number Число для проверки
-        * @return true если есть повторяющиеся цифры
+        * @brief РџСЂРѕРІРµСЂСЏРµС‚ РµСЃС‚СЊ Р»Рё РІ С‡РёСЃР»Рµ РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ С†РёС„СЂС‹
+        * @param number Р§РёСЃР»Рѕ РґР»СЏ РїСЂРѕРІРµСЂРєРё
+        * @return true РµСЃР»Рё РµСЃС‚СЊ РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ С†РёС„СЂС‹
         */
         bool has_repeating_digits(int number) const;
     };

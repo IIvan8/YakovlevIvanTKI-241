@@ -1,4 +1,4 @@
-#include "Task1.h"
+п»ї#include "Task1.h"
 #include <cmath>
 
 namespace miit::algebra
@@ -14,11 +14,6 @@ namespace miit::algebra
         }
 
         return result;
-    }
-
-    std::string Task1::get_name() const
-    {
-        return "Замена последнего отрицательного элемента на модуль первого";
     }
 
     size_t Task1::find_last_negative(const Matrix& matrix) const
