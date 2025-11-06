@@ -2,14 +2,27 @@
 
 #include "Matrix.h"
 #include "Generator.h"
-#include "Task1.h"
-#include "Task2.h"
-#include "Task3.h"
 #include <memory>
 #include <vector>
 
 namespace miit::algebra
 {
+    /**
+    * @brief Базовый класс для всех заданий
+    */
+    class Task
+    {
+    public:
+        virtual ~Task() = default;
+
+        /**
+        * @brief Выполняет задание
+        * @param matrix Исходная матрица
+        * @return Результирующая матрица
+        */
+        virtual std::unique_ptr<Matrix> execute(const Matrix& matrix) const = 0;
+    };
+
     /**
     * @brief Класс для выполнения заданий над матрицей
     */
@@ -47,4 +60,4 @@ namespace miit::algebra
         */
         virtual std::string get_task_name(int task_number) const;
     };
-}
+}   

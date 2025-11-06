@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Exercise.h"
 #include "Matrix.h"
 #include <memory>
 #include <string>
@@ -9,7 +10,7 @@ namespace miit::algebra
     /**
     * @brief Задание 2: Удаление элементов с повторяющимися цифрами
     */
-    class Task2
+    class Task2 : public Task
     {
     public:
         /**
@@ -17,7 +18,7 @@ namespace miit::algebra
         * @param matrix Исходная матрица
         * @return Результирующая матрица
         */
-        std::unique_ptr<Matrix> execute(const Matrix& matrix) const;  
+        std::unique_ptr<Matrix> execute(const Matrix& matrix) const override;  
 
     private:
         /**
