@@ -3,14 +3,14 @@
 
 namespace miit::algebra
 {
-    std::unique_ptr<Matrix> Task1::execute(const Matrix& matrix) const
+    std::unique_ptr<Matrix> Task1::execute() const
     {
-        auto result = std::make_unique<Matrix>(matrix);
-        size_t last_neg_index = find_last_negative(matrix);
+        auto result = std::make_unique<Matrix>(get_matrix());
+        size_t last_neg_index = find_last_negative(get_matrix());
 
-        if (last_neg_index < matrix.size() && !matrix.empty())
+        if (last_neg_index < get_matrix_size() && !is_matrix_empty())
         {
-            (*result)[last_neg_index] = std::abs(matrix[0]);
+            (*result)[last_neg_index] = std::abs(get_matrix_element(0));
         }
 
         return result;
@@ -26,5 +26,10 @@ namespace miit::algebra
             }
         }
         return matrix.size();
+    }
+
+    std::string Task1::get_name() const
+    {
+        return "Task1 - Замена последнего отрицательного элемента на модуль первого";
     }
 }

@@ -5,11 +5,12 @@
 
 namespace miit::algebra
 {
-    std::unique_ptr<Matrix> Task2::execute(const Matrix& matrix) const
+    std::unique_ptr<Matrix> Task2::execute() const
     {
         std::vector<int> new_data;
 
-        for (const auto& element : matrix)
+        const Matrix& mat = get_matrix();
+        for (const auto& element : mat)
         {
             if (!has_repeating_digits(element))
             {
@@ -33,5 +34,10 @@ namespace miit::algebra
         }
 
         return false;
+    }
+
+    std::string Task2::get_name() const
+    {
+        return "Task2 - Удаление элементов с повторяющимися цифрами";
     }
 }

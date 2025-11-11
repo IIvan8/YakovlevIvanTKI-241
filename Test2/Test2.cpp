@@ -2,14 +2,15 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "../Decision2/Matrix.h"
-#include "../Decision2/RandomGenerator.h"
+#include "../Decision2/Generator.h"           
+#include "../Decision2/ConstantGenerator.h"   
 #include "../Decision2/IStreamGenerator.h"
+#include "../Decision2/RandomGenerator.h"
+#include "../Decision2/Matrix.h"
 #include "../Decision2/Exercise.h"
 #include "../Decision2/Task1.h"
 #include "../Decision2/Task2.h"
 #include "../Decision2/Task3.h"
-#include "../Decision2/Generator.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace miit::algebra;
@@ -71,6 +72,7 @@ namespace MatrixTests
             Matrix matrix(3);
             Assert::IsFalse(matrix.empty());
         }
+
         TEST_METHOD(TestMatrixFillWithGenerator)
         {
             Matrix matrix(3);
@@ -81,6 +83,7 @@ namespace MatrixTests
             Assert::AreEqual(7, matrix[1]);
             Assert::AreEqual(7, matrix[2]);
         }
+
         TEST_METHOD(TestMatrixDereferenceOperator)
         {
             std::vector<int> values = { 1, 2, 3 };
@@ -91,6 +94,7 @@ namespace MatrixTests
                 Assert::AreEqual(values[i], data[i]);
             }
         }
+
         TEST_METHOD(TestMatrixIterators)
         {
             std::vector<int> values = { 1, 2, 3 };
@@ -112,9 +116,12 @@ namespace MatrixTests
         TEST_METHOD(Task1WithNegativeElements)
         {
             std::vector<int> values = { 5, -2, 3, -4, 1 };
-            Matrix matrix(values);
-            Task1 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task1->execute();
 
             // -4 (последний отрицательный) должен быть заменен на |5| = 5
             Assert::AreEqual(5, (*result)[3]);
@@ -128,9 +135,12 @@ namespace MatrixTests
         TEST_METHOD(Task1WithoutNegativeElements)
         {
             std::vector<int> values = { 1, 2, 3, 4, 5 };
-            Matrix matrix(values);
-            Task1 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task1->execute();
 
             // Массив должен остаться неизменным
             for (size_t i = 0; i < values.size(); ++i) {
@@ -140,28 +150,38 @@ namespace MatrixTests
 
         TEST_METHOD(Task1WithEmptyMatrix)
         {
-            Matrix matrix(0);
-            Task1 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(0);
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task1->execute();
             Assert::IsTrue(result->empty());
         }
 
         TEST_METHOD(Task1WithSingleNegativeElement)
         {
             std::vector<int> values = { -5 };
-            Matrix matrix(values);
-            Task1 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task1->execute();
 
             // -5 должен быть заменен на | -5 | = 5
             Assert::AreEqual(5, (*result)[0]);
         }
+
         TEST_METHOD(Task1WithAllNegativeElements)
         {
             std::vector<int> values = { -1, -2, -3, -4 };
-            Matrix matrix(values);
-            Task1 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task1->execute();
 
             // Последний отрицательный (-4) должен быть заменен на | -1 | = 1
             Assert::AreEqual(1, (*result)[3]);
@@ -179,9 +199,12 @@ namespace MatrixTests
         TEST_METHOD(Task2WithRepeatingDigits)
         {
             std::vector<int> values = { 112, 123, 122, 456, 111 };
-            Matrix matrix(values);
-            Task2 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task2 = std::make_unique<Task2>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task2->execute();
 
             // Должны остаться только 123 и 456 (без повторяющихся цифр)
             Assert::AreEqual(size_t(2), result->size());
@@ -192,9 +215,12 @@ namespace MatrixTests
         TEST_METHOD(Task2WithoutRepeatingDigits)
         {
             std::vector<int> values = { 123, 456, 789 };
-            Matrix matrix(values);
-            Task2 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task2 = std::make_unique<Task2>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task2->execute();
 
             // Все элементы должны остаться
             Assert::AreEqual(size_t(3), result->size());
@@ -206,9 +232,12 @@ namespace MatrixTests
         TEST_METHOD(Task2WithNegativeNumbers)
         {
             std::vector<int> values = { -112, -123, 456 };
-            Matrix matrix(values);
-            Task2 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task2 = std::make_unique<Task2>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task2->execute();
 
             // Должны остаться -123 и 456
             Assert::AreEqual(size_t(2), result->size());
@@ -219,9 +248,12 @@ namespace MatrixTests
         TEST_METHOD(Task2WithSingleDigitNumbers)
         {
             std::vector<int> values = { 1, 2, 3 };
-            Matrix matrix(values);
-            Task2 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task2 = std::make_unique<Task2>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task2->execute();
 
             // Все однозначные числа не имеют повторяющихся цифр
             Assert::AreEqual(size_t(3), result->size());
@@ -235,9 +267,12 @@ namespace MatrixTests
         TEST_METHOD(Task3Transformation)
         {
             std::vector<int> values = { 1, 2, 3, 4, 5 };
-            Matrix matrix(values);
-            Task3 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task3 = std::make_unique<Task3>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task3->execute();
 
             // Ожидаемый результат: четные индексы - умножение, нечетные - смена знака
             std::vector<int> expected = { 0, -2, 6, -4, 20 };
@@ -250,18 +285,24 @@ namespace MatrixTests
 
         TEST_METHOD(Task3WithEmptyMatrix)
         {
-            Matrix matrix(0);
-            Task3 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(0);
+            auto task3 = std::make_unique<Task3>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task3->execute();
             Assert::IsTrue(result->empty());
         }
 
         TEST_METHOD(Task3WithSingleElement)
         {
             std::vector<int> values = { 10 };
-            Matrix matrix(values);
-            Task3 task;
-            auto result = task.execute(matrix);
+            auto matrix = std::make_unique<Matrix>(values);
+            auto task3 = std::make_unique<Task3>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 0)
+            );
+            auto result = task3->execute();
 
             // Индекс 0 (четный): 0 * 10 = 0
             Assert::AreEqual(0, (*result)[0]);
@@ -275,7 +316,7 @@ namespace MatrixTests
         TEST_METHOD(ExerciseConstructorAndGetMatrix)
         {
             auto matrix = std::make_unique<Matrix>(std::vector<int>{1, 2, 3});
-            auto exercise = std::make_unique<Exercise>(
+            auto exercise = std::make_unique<Task1>(
                 std::move(matrix),
                 std::make_unique<RandomGenerator>(0, 1)
             );
@@ -286,37 +327,27 @@ namespace MatrixTests
             Assert::AreEqual(3, exercise->get_matrix()[2]);
         }
 
-        TEST_METHOD(ExerciseTaskExecution)
-        {
-            auto matrix = std::make_unique<Matrix>(std::vector<int>{1, -2, 3, -4, 5});
-            auto exercise = std::make_unique<Exercise>(
-                std::move(matrix),
-                std::make_unique<RandomGenerator>(0, 1)
-            );
-
-            auto task1_result = exercise->execute_task(1);
-            auto task2_result = exercise->execute_task(2);
-            auto task3_result = exercise->execute_task(3);
-
-            Assert::IsTrue(task1_result != nullptr);
-            Assert::IsTrue(task2_result != nullptr);
-            Assert::IsTrue(task3_result != nullptr);
-            Assert::AreEqual(size_t(5), task1_result->size());
-            Assert::IsTrue(task2_result->size() <= size_t(5));
-            Assert::AreEqual(size_t(5), task3_result->size());
-        }
-
         TEST_METHOD(ExerciseTaskNames)
         {
             auto matrix = std::make_unique<Matrix>(std::vector<int>{1, 2, 3});
-            auto exercise = std::make_unique<Exercise>(
-                std::move(matrix),
+
+            auto task1 = std::make_unique<Task1>(
+                std::make_unique<Matrix>(*matrix),
                 std::make_unique<RandomGenerator>(0, 1)
             );
+            Assert::AreEqual(std::string("Task1 - Замена последнего отрицательного элемента на модуль первого"), task1->get_name());
 
-            Assert::AreEqual(std::string("Task1"), exercise->get_task_name(1));
-            Assert::AreEqual(std::string("Task2"), exercise->get_task_name(2));
-            Assert::AreEqual(std::string("Task3"), exercise->get_task_name(3));
+            auto task2 = std::make_unique<Task2>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 1)
+            );
+            Assert::AreEqual(std::string("Task2 - Удаление элементов с повторяющимися цифрами"), task2->get_name());
+
+            auto task3 = std::make_unique<Task3>(
+                std::make_unique<Matrix>(*matrix),
+                std::make_unique<RandomGenerator>(0, 1)
+            );
+            Assert::AreEqual(std::string("Task3 - Преобразование массива по правилу"), task3->get_name());
         }
     };
 
@@ -357,7 +388,7 @@ namespace MatrixTests
         TEST_METHOD(ConstantGeneratorWithNegativeValue)
         {
             ConstantGenerator gen(-100);
-            Assert::AreEqual(-100, gen.generate()); 
+            Assert::AreEqual(-100, gen.generate());
         }
 
         TEST_METHOD(ConstantGeneratorWithMatrixFill)

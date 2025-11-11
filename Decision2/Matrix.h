@@ -18,7 +18,7 @@ namespace miit::algebra
 
     public:
         // Конструкторы по умолчанию
-        Matrix() = default;
+        Matrix();
         Matrix(const Matrix&) = default;
         Matrix(Matrix&&) = default;
         ~Matrix() = default;
@@ -102,21 +102,21 @@ namespace miit::algebra
         /**
         * @brief Возвращает итератор на начало
         */
-        auto begin() { return data.begin(); }
+        std::vector<int>::iterator begin();
 
         /**
         * @brief Возвращает константный итератор на начало
         */
-        auto begin() const { return data.begin(); }
+        std::vector<int>::const_iterator begin() const;
 
         /**
         * @brief Возвращает итератор на конец
         */
-        auto end() { return data.end(); }
+        std::vector<int>::iterator end();
 
         /**
         * @brief Возвращает константный итератор на конец
         */
-        auto end() const { return data.end(); }
+        std::vector<int>::const_iterator end() const;
     };
-}   
+}

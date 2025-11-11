@@ -4,6 +4,11 @@
 
 namespace miit::algebra
 {
+    Matrix::Matrix()
+        : data()
+    {
+    }
+
     Matrix::Matrix(size_t size)
         : data(size)
     {
@@ -81,5 +86,25 @@ namespace miit::algebra
     const std::vector<int>& Matrix::operator*() const
     {
         return data;
+    }
+
+    std::vector<int>::iterator Matrix::begin()
+    {
+        return data.begin();
+    }
+
+    std::vector<int>::const_iterator Matrix::begin() const
+    {
+        return data.begin();
+    }
+
+    std::vector<int>::iterator Matrix::end()
+    {
+        return data.end();
+    }
+
+    std::vector<int>::const_iterator Matrix::end() const
+    {
+        return data.end();
     }
 }

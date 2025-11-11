@@ -4,27 +4,12 @@
 #include "Generator.h"
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace miit::algebra
 {
     /**
     * @brief Базовый класс для всех заданий
-    */
-    class Task
-    {
-    public:
-        virtual ~Task() = default;
-
-        /**
-        * @brief Выполняет задание
-        * @param matrix Исходная матрица
-        * @return Результирующая матрица
-        */
-        virtual std::unique_ptr<Matrix> execute(const Matrix& matrix) const = 0;
-    };
-
-    /**
-    * @brief Класс для выполнения заданий над матрицей
     */
     class Exercise
     {
@@ -35,29 +20,39 @@ namespace miit::algebra
     public:
         /**
         * @brief Конструктор упражнения
-        * @param matrix Умный указатель на матрицу
-        * @param generator Умный указатель на генератор
         */
         Exercise(std::unique_ptr<Matrix> matrix, std::unique_ptr<Generator> generator);
 
+        virtual ~Exercise() = default;
+
         /**
         * @brief Возвращает исходную матрицу
-        * @return Ссылка на исходную матрицу
         */
         const Matrix& get_matrix() const;
 
         /**
-        * @brief Выполняет указанное задание
-        * @param task_number Номер задания (1, 2 или 3)
-        * @return Результат выполнения задания
+        * @brief Возвращает размер матрицы
         */
-        virtual std::unique_ptr<Matrix> execute_task(int task_number) const;
+        size_t get_matrix_size() const;
 
         /**
-        * @brief Возвращает название указанного задания
-        * @param task_number Номер задания (1, 2 или 3)
-        * @return Название задания
+        * @brief Возвращает элемент матрицы по индексу
         */
-        virtual std::string get_task_name(int task_number) const;
+        int get_matrix_element(size_t index) const;
+
+        /**
+        * @brief Проверяет пуста ли матрица
+        */
+        bool is_matrix_empty() const;
+
+        /**
+        * @brief Выполняет задание - виртуальный метод
+        */
+        virtual std::unique_ptr<Matrix> execute() const = 0;
+
+        /**
+        * @brief Возвращает название задания
+        */
+        virtual std::string get_name() const = 0;
     };
-}   
+}

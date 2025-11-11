@@ -1,102 +1,159 @@
 ﻿#include <iostream>
 #include <memory>
 #include <locale>
-#include "../Decision2/Matrix.h"
-#include "../Decision2/RandomGenerator.h"
+#include "../Decision2/Generator.h"           
+#include "../Decision2/ConstantGenerator.h"   
 #include "../Decision2/IStreamGenerator.h"
+#include "../Decision2/RandomGenerator.h"
+#include "../Decision2/Matrix.h"
 #include "../Decision2/Exercise.h"
-#include "../Decision2/Generator.h"
-
+#include "../Decision2/Task1.h"
+#include "../Decision2/Task2.h"
+#include "../Decision2/Task3.h"
 
 using namespace miit::algebra;
+using namespace std;
+
+/**
+* @brief Очищает буфер ввода
+*/
+void clearInputBuffer()
+{
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+/**
+* @brief Enum для выбора способа заполнения массива
+*/
+enum InputMethod
+{
+    RANDOM = 0,
+    KEYBOARD = 1,
+    CONSTANT = 2
+};
 
 int main()
 {
-    setlocale(LC_ALL, "RUSSIAN");
+    setlocale(LC_ALL, "Russian");
+
     try
     {
-        std::cout << "=== Демонстрация работы с случайным заполнением ===" << std::endl;
+        cout << "Выберите способ заполнения массива:" << endl;
+        cout << RANDOM << " - случайный ввод" << endl;
+        cout << KEYBOARD << " - ввод с клавиатуры" << endl;
+        cout << CONSTANT << " - с константой" << endl;
+        cout << "Ваш выбор: ";
 
-        // Заполняем матрицу ДО создания Exercise
-        auto random_matrix = std::make_unique<Matrix>(8);
-        auto random_generator = std::make_unique<RandomGenerator>(-50, 50);
-        random_matrix->fill(std::move(random_generator));
+        int choice;
+        cin >> choice;
+        clearInputBuffer();
 
-        auto random_exercise = std::make_unique<Exercise>(
-            std::move(random_matrix),
-            std::make_unique<RandomGenerator>(-50, 50) // второй генератор для Exercise
-        );
-
-        std::cout << "Исходный массив: " << random_exercise->get_matrix() << std::endl;
-
-        auto task1_random = random_exercise->execute_task(1);
-        std::cout << random_exercise->get_task_name(1) << ": " << *task1_random << std::endl;
-
-        auto task2_random = random_exercise->execute_task(2);
-        std::cout << random_exercise->get_task_name(2) << ": " << *task2_random << std::endl;
-
-        auto task3_random = random_exercise->execute_task(3);
-        std::cout << random_exercise->get_task_name(3) << ": " << *task3_random << std::endl;
-
-        std::cout << "\n=== Демонстрация работы с вводом с клавиатуры ===" << std::endl;
-
-        std::cout << "Введите размер массива: ";
+        unique_ptr<Matrix> matrix;
         size_t size;
-        std::cin >> size;
 
-        if (size == 0)
-        {
-            std::cout << "Размер массива должен быть больше 0" << std::endl;
-            return 1;
+        switch (choice) {
+        case RANDOM: {
+            cout << "Введите размер массива: ";
+            cin >> size;
+            clearInputBuffer();
+
+            if (size == 0) {
+                throw invalid_argument("Размер массива не может быть 0");
+            }
+
+            matrix = make_unique<Matrix>(size);
+
+            int min_val = 0, max_val = 0;
+            cout << "Минимальное значение: ";
+            cin >> min_val;
+            cout << "Максимальное значение: ";
+            cin >> max_val;
+            clearInputBuffer();
+
+            auto random_gen = make_unique<RandomGenerator>(min_val, max_val);
+            matrix->fill(move(random_gen));
+            cout << "Массив заполнен случайными числами от " << min_val << " до " << max_val << endl;
+            break;
+        }
+        case KEYBOARD: {
+            cout << "Введите размер массива: ";
+            cin >> size;
+            clearInputBuffer();
+
+            if (size == 0) {
+                throw invalid_argument("Размер массива не может быть 0");
+            }
+
+            matrix = make_unique<Matrix>(size);
+            auto input_gen = make_unique<IStreamGenerator>();
+            cout << "Введите " << size << " элементов массива: ";
+            matrix->fill(move(input_gen));
+            clearInputBuffer();
+            cout << "Массив заполнен вручную" << endl;
+            break;
+        }
+        case CONSTANT: {
+            cout << "Введите размер массива: ";
+            cin >> size;
+            clearInputBuffer();
+
+            if (size == 0) {
+                throw invalid_argument("Размер массива не может быть 0");
+            }
+
+            int constant_value = 0;
+            cout << "Введите значение для заполнения: ";
+            cin >> constant_value;
+            clearInputBuffer();
+
+            matrix = make_unique<Matrix>(size);
+            auto const_gen = make_unique<ConstantGenerator>(constant_value);
+            matrix->fill(move(const_gen));
+            cout << "Массив заполнен константой " << constant_value << endl;
+            break;
+        }
+        default:
+            throw invalid_argument("Неверный выбор метода ввода");
         }
 
-        // Заполняем матрицу ДО создания Exercise
-        auto keyboard_matrix = std::make_unique<Matrix>(size);
-        auto keyboard_generator = std::make_unique<IStreamGenerator>();
-        keyboard_matrix->fill(std::move(keyboard_generator));
+        cout << "\nИсходный массив: " << *matrix << endl;
+        cout << endl;
 
-        auto keyboard_exercise = std::make_unique<Exercise>(
-            std::move(keyboard_matrix),
-            std::make_unique<IStreamGenerator>() // второй генератор для Exercise
+        // Создание и выполнение Task1
+        auto task1 = make_unique<Task1>(
+            make_unique<Matrix>(*matrix),
+            make_unique<RandomGenerator>(0, 0)
         );
+        auto result1 = task1->execute();
+        cout << task1->get_name() << ":" << endl;
+        cout << "Результат: " << *result1 << endl;
+        cout << endl;
 
-        std::cout << "Введенный массив: " << keyboard_exercise->get_matrix() << std::endl;
-
-        auto task1_keyboard = keyboard_exercise->execute_task(1);
-        std::cout << keyboard_exercise->get_task_name(1) << ": " << *task1_keyboard << std::endl;
-
-        auto task2_keyboard = keyboard_exercise->execute_task(2);
-        std::cout << keyboard_exercise->get_task_name(2) << ": " << *task2_keyboard << std::endl;
-
-        auto task3_keyboard = keyboard_exercise->execute_task(3);
-        std::cout << keyboard_exercise->get_task_name(3) << ": " << *task3_keyboard << std::endl;
-
-        std::cout << "\n=== Демонстрация работы с постоянным заполнением ===" << std::endl;
-
-        // Заполняем матрицу ДО создания Exercise
-        auto constant_matrix = std::make_unique<Matrix>(6);
-        auto constant_generator = std::make_unique<ConstantGenerator>(42);
-        constant_matrix->fill(std::move(constant_generator));
-
-        auto constant_exercise = std::make_unique<Exercise>(
-            std::move(constant_matrix),
-            std::make_unique<ConstantGenerator>(42) // второй генератор для Exercise
+        // Создание и выполнение Task2
+        auto task2 = make_unique<Task2>(
+            make_unique<Matrix>(*matrix),
+            make_unique<RandomGenerator>(0, 0)
         );
+        auto result2 = task2->execute();
+        cout << task2->get_name() << ":" << endl;
+        cout << "Результат: " << *result2 << endl;
+        cout << endl;
 
-        std::cout << "Массив, заполненный ConstantGenerator(42): " << constant_exercise->get_matrix() << std::endl;
+        // Создание и выполнение Task3
+        auto task3 = make_unique<Task3>(
+            make_unique<Matrix>(*matrix),
+            make_unique<RandomGenerator>(0, 0)
+        );
+        auto result3 = task3->execute();
+        cout << task3->get_name() << ":" << endl;
+        cout << "Результат: " << *result3 << endl;
 
-        auto task1_constant = constant_exercise->execute_task(1);
-        std::cout << constant_exercise->get_task_name(1) << ": " << *task1_constant << std::endl;
-
-        auto task2_constant = constant_exercise->execute_task(2);
-        std::cout << constant_exercise->get_task_name(2) << ": " << *task2_constant << std::endl;
-
-        auto task3_constant = constant_exercise->execute_task(3);
-        std::cout << constant_exercise->get_task_name(3) << ": " << *task3_constant << std::endl;
+        cout << "\n=== ПРОГРАММА ЗАВЕРШЕНА ===" << endl;
     }
-    catch (const std::exception& e)
+    catch (const exception& e)
     {
-        std::cerr << "Ошибка: " << e.what() << std::endl;
+        cerr << "Ошибка: " << e.what() << endl;
         return 1;
     }
 
