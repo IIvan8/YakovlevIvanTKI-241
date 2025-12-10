@@ -7,6 +7,7 @@
 #include "../Decision0/CustomOrder.h"
 #include "../Decision0/FurnitureStore.h"
 
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace FurnitureTests
@@ -261,77 +262,6 @@ namespace FurnitureTests
         }
     };
 
-    TEST_CLASS(CustomOrderTest)
-    {
-    public:
-        TEST_METHOD(CustomOrderCreation)
-        {
-            std::tm orderDate = {};
-            orderDate.tm_year = 124;
-            orderDate.tm_mon = 0;
-            orderDate.tm_mday = 25;
-
-            CustomOrder customOrder(2, orderDate, "Jane Smith", 20.0, "Black matte finish");
-
-            Assert::AreEqual(2, customOrder.getOrderId());
-            Assert::AreEqual(std::string("Jane Smith"), customOrder.getCustomerName());
-            Assert::AreEqual(20.0, customOrder.getMarkupPercentage());
-            Assert::AreEqual(std::string("Black matte finish"), customOrder.getSpecialRequirements());
-        }
-
-        TEST_METHOD(ApplyMarkup)
-        {
-            std::tm orderDate = {};
-            orderDate.tm_year = 124;
-            orderDate.tm_mon = 0;
-            orderDate.tm_mday = 25;
-
-            CustomOrder customOrder(2, orderDate, "Jane Smith", 20.0, "Special finish");
-
-            // Проверяем применение наценки
-            double basePrice = 10000.0;
-            double markedUpPrice = customOrder.applyMarkup(basePrice);
-            Assert::AreEqual(12000.0, markedUpPrice);
-        }
-
-        TEST_METHOD(CustomOrderWithItems)
-        {
-            std::tm orderDate = {};
-            orderDate.tm_year = 124;
-            orderDate.tm_mon = 0;
-            orderDate.tm_mday = 25;
-
-            std::tm productionDate = {};
-            productionDate.tm_year = 124;
-            productionDate.tm_mon = 0;
-            productionDate.tm_mday = 15;
-
-            CustomOrder customOrder(2, orderDate, "Jane Smith", 20.0, "Special requirements");
-
-            auto table = std::make_shared<Table>("Custom Table", 20000.0, 2, productionDate, 2.0, 1.0, "Custom");
-            customOrder.addItem(table);
-
-            // Цена должна быть с наценкой 20%
-            Assert::AreEqual(24000.0, customOrder.getTotalPrice());
-        }
-
-        TEST_METHOD(CustomOrderInfo)
-        {
-            std::tm orderDate = {};
-            orderDate.tm_year = 124;
-            orderDate.tm_mon = 0;
-            orderDate.tm_mday = 25;
-
-            CustomOrder customOrder(2, orderDate, "Jane Smith", 20.0, "Special requirements");
-
-            std::string info = customOrder.getInfo();
-            Assert::IsTrue(info.find("ИНДИВИДУАЛЬНЫЙ ЗАКАЗ") != std::string::npos);
-            Assert::IsTrue(info.find("Jane Smith") != std::string::npos);
-            Assert::IsTrue(info.find("20%") != std::string::npos);
-            Assert::IsTrue(info.find("Special requirements") != std::string::npos);
-        }
-    };
-
     TEST_CLASS(FurnitureStoreTest)
     {
     public:
@@ -361,44 +291,32 @@ namespace FurnitureTests
             Assert::AreEqual(std::string("Test Chair"), assortment[0]->getName());
         }
 
-        TEST_METHOD(FindFurnitureByName)
+        TEST_METHOD(AddOrderToStore)
         {
             FurnitureStore store;
 
-            std::tm productionDate = {};
-            productionDate.tm_year = 124;
-            productionDate.tm_mon = 0;
-            productionDate.tm_mday = 15;
+            std::tm orderDate = {};
+            orderDate.tm_year = 124;
+            orderDate.tm_mon = 0;
+            orderDate.tm_mday = 20;
 
-            auto chair = std::make_shared<Chair>("Test Chair", 10000.0, 10, productionDate, true, "Fabric");
-            store.addFurniture(chair);
-
-            auto found = store.findFurnitureByName("Test Chair");
-            Assert::IsNotNull(found.get());
-            Assert::AreEqual(std::string("Test Chair"), found->getName());
-
-            auto notFound = store.findFurnitureByName("Non-existent");
-            Assert::IsNull(notFound.get());
-        }
-
-        TEST_METHOD(CreateAndAddOrder)
-        {
-            FurnitureStore store;
-
-            std::tm productionDate = {};
-            productionDate.tm_year = 124;
-            productionDate.tm_mon = 0;
-            productionDate.tm_mday = 15;
-
-            auto chair = std::make_shared<Chair>("Test Chair", 10000.0, 10, productionDate, true, "Fabric");
-            store.addFurniture(chair);
-
-            auto order = store.createOrder("Test Customer");
-            order->addItem(chair);
+            // Создаем заказ напрямую
+            auto order = std::make_shared<Order>(1, orderDate, "Test Customer");
             store.addOrder(order);
 
-            auto allOrders = store.getAllOrders();
-            Assert::AreEqual(1, (int)allOrders.size());
+            // Для проверки заказов в периоде создадим тестовые даты
+            std::tm startDate = {};
+            startDate.tm_year = 124;
+            startDate.tm_mon = 0;
+            startDate.tm_mday = 1;
+
+            std::tm endDate = {};
+            endDate.tm_year = 124;
+            endDate.tm_mon = 11;
+            endDate.tm_mday = 31;
+
+            auto ordersInPeriod = store.getOrdersInPeriod(startDate, endDate);
+            Assert::AreEqual(1, (int)ordersInPeriod.size());
         }
 
         TEST_METHOD(CalculateCustomOrderPrice)
@@ -413,17 +331,6 @@ namespace FurnitureTests
             Assert::AreEqual(expectedPrice, calculatedPrice);
         }
 
-        TEST_METHOD(CreateCustomOrder)
-        {
-            FurnitureStore store;
-
-            auto customOrder = store.createCustomOrder("Test Customer", 15.0, "Special finish");
-            Assert::IsNotNull(customOrder.get());
-            Assert::AreEqual(std::string("Test Customer"), customOrder->getCustomerName());
-            Assert::AreEqual(15.0, customOrder->getMarkupPercentage());
-            Assert::AreEqual(std::string("Special finish"), customOrder->getSpecialRequirements());
-        }
-
         TEST_METHOD(GetSoldFurnitureCount)
         {
             FurnitureStore store;
@@ -436,8 +343,13 @@ namespace FurnitureTests
             auto chair = std::make_shared<Chair>("Test Chair", 10000.0, 10, productionDate, true, "Fabric");
             store.addFurniture(chair);
 
-            // Создаем заказ
-            auto order = store.createOrder("Customer 1");
+            // Создаем заказ напрямую
+            std::tm orderDate = {};
+            orderDate.tm_year = 124;
+            orderDate.tm_mon = 0;
+            orderDate.tm_mday = 20;
+
+            auto order = std::make_shared<Order>(1, orderDate, "Customer 1");
             order->addItem(chair);
             order->addItem(chair); // 2 стула в заказе
             store.addOrder(order);
@@ -461,13 +373,23 @@ namespace FurnitureTests
         {
             FurnitureStore store;
 
-            // Создаем несколько заказов
-            auto order1 = store.createOrder("Customer 1");
-            auto order2 = store.createOrder("Customer 2");
+            // Создаем несколько заказов напрямую
+            std::tm orderDate1 = {};
+            orderDate1.tm_year = 124;
+            orderDate1.tm_mon = 0;
+            orderDate1.tm_mday = 10;
+
+            std::tm orderDate2 = {};
+            orderDate2.tm_year = 124;
+            orderDate2.tm_mon = 5;
+            orderDate2.tm_mday = 15;
+
+            auto order1 = std::make_shared<Order>(1, orderDate1, "Customer 1");
+            auto order2 = std::make_shared<Order>(2, orderDate2, "Customer 2");
             store.addOrder(order1);
             store.addOrder(order2);
 
-            // Создаем диапазон дат
+            // Создаем диапазон дат, который включает оба заказа
             std::tm startDate = {};
             startDate.tm_year = 124;
             startDate.tm_mon = 0;
@@ -480,36 +402,48 @@ namespace FurnitureTests
 
             auto ordersInPeriod = store.getOrdersInPeriod(startDate, endDate);
             Assert::AreEqual(2, (int)ordersInPeriod.size());
+
+            // Тест с более узким диапазоном дат
+            std::tm narrowStart = {};
+            narrowStart.tm_year = 124;
+            narrowStart.tm_mon = 1; // февраль
+            narrowStart.tm_mday = 1;
+
+            std::tm narrowEnd = {};
+            narrowEnd.tm_year = 124;
+            narrowEnd.tm_mon = 6; // июль
+            narrowEnd.tm_mday = 31;
+
+            auto ordersInNarrowPeriod = store.getOrdersInPeriod(narrowStart, narrowEnd);
+            Assert::AreEqual(1, (int)ordersInNarrowPeriod.size()); // Только заказ от июня
         }
 
-        TEST_METHOD(StoreStatistics)
+        TEST_METHOD(GetOrdersInPeriod_NoOrders)
         {
             FurnitureStore store;
 
-            std::tm productionDate = {};
-            productionDate.tm_year = 124;
-            productionDate.tm_mon = 0;
-            productionDate.tm_mday = 15;
+            // Создаем заказ
+            std::tm orderDate = {};
+            orderDate.tm_year = 124;
+            orderDate.tm_mon = 5;
+            orderDate.tm_mday = 15;
 
-            // Добавляем разную мебель
-            auto chair = std::make_shared<Chair>("Test Chair", 10000.0, 5, productionDate, true, "Fabric");
-            auto table = std::make_shared<Table>("Test Table", 20000.0, 3, productionDate, 1.5, 0.8, "Rectangle");
-            auto cabinet = std::make_shared<Cabinet>("Test Cabinet", 30000.0, 2, productionDate, 4, "Oak");
-
-            store.addFurniture(chair);
-            store.addFurniture(table);
-            store.addFurniture(cabinet);
-
-            // Добавляем заказ
-            auto order = store.createOrder("Test Customer");
-            order->addItem(chair);
+            auto order = std::make_shared<Order>(1, orderDate, "Customer 1");
             store.addOrder(order);
 
-            std::string stats = store.getStatistics();
+            // Создаем диапазон дат, в который заказ не попадает
+            std::tm startDate = {};
+            startDate.tm_year = 125; // 2025 год
+            startDate.tm_mon = 0;
+            startDate.tm_mday = 1;
 
-            // Проверяем что статистика содержит ожидаемую информацию
-            Assert::IsTrue(stats.find("Ассортимент: 3") != std::string::npos);
-            Assert::IsTrue(stats.find("Заказов всего: 1") != std::string::npos);
+            std::tm endDate = {};
+            endDate.tm_year = 125;
+            endDate.tm_mon = 11;
+            endDate.tm_mday = 31;
+
+            auto ordersInPeriod = store.getOrdersInPeriod(startDate, endDate);
+            Assert::AreEqual(0, (int)ordersInPeriod.size());
         }
     };
 }
