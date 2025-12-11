@@ -141,7 +141,6 @@ int main() {
         return 1;
     }
 
-    // Обработка выбора (однократно)
     handleUserChoice(static_cast<MenuChoice>(choice), store);
 
     string exitMessage = "Программа завершена.";
