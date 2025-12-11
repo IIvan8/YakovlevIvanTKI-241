@@ -126,46 +126,37 @@ int main() {
     string systemTitle = " СИСТЕМА МЕБЕЛЬНОГО МАГАЗИНА ";
     cout << systemTitle << "\n\n";
 
-    while (true) {
-        showMainMenu();
+    showMainMenu();
 
-        string choicePrompt = "Выберите операцию (0-4): ";
-        cout << choicePrompt;
+    string choicePrompt = "Выберите операцию (0-4): ";
+    cout << choicePrompt;
 
-        int choice;
-        cin >> choice;
-        cin.ignore();
+    int choice;
+    cin >> choice;
+    cin.ignore();
 
-        if (cin.fail()) {
-            string errorMessage = "Ошибка ввода. Попробуйте снова.\n";
-            cout << errorMessage;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
-        }
-
-        bool shouldContinue = handleUserChoice(static_cast<MenuChoice>(choice), store);
-
-        if (!shouldContinue) {
-            string exitMessage = "Программа завершена.";
-            cout << exitMessage << endl;
-            break;
-        }
-
-        cout << "\nНажмите Enter для продолжения...";
-        cin.get();
+    if (cin.fail()) {
+        string errorMessage = "Ошибка ввода. Программа завершена.\n";
+        cout << errorMessage;
+        return 1;
     }
+
+    // Обработка выбора (однократно)
+    handleUserChoice(static_cast<MenuChoice>(choice), store);
+
+    string exitMessage = "Программа завершена.";
+    cout << exitMessage << endl;
 
     return 0;
 }
 
 void showMainMenu() {
-    string menuTitle = " ГЛАВНОЕ МЕНЮ СИСТЕМЫ МЕБЕЛЬНОГО МАГАЗИНА ";
-    string option1 = "1 - Ассортимент мебели и цены";
-    string option2 = "2 - Количество проданной мебели за период";
-    string option3 = "3 - Список заказов за период";
-    string option4 = "4 - Расчет стоимости индивидуального заказа";
-    string option0 = "0 - Выход";
+    const string menuTitle = " ГЛАВНОЕ МЕНЮ СИСТЕМЫ МЕБЕЛЬНОГО МАГАЗИНА ";
+    const string option1 = "1 - Ассортимент мебели и цены";
+    const string option2 = "2 - Количество проданной мебели за период";
+    const string option3 = "3 - Список заказов за период";
+    const string option4 = "4 - Расчет стоимости индивидуального заказа";
+    const string option0 = "0 - Выход";
 
     cout << "\n" << menuTitle << "\n";
     cout << option1 << "\n";
